@@ -1,0 +1,54 @@
+{% extends "onlinecourse/base.html" %}
+{% load static %}
+
+{% block title %}{{ course.name }} | OnlineCourse{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="p-5 mb-4 bg-light rounded-3">
+    <div class="container-fluid py-3">
+      <h1 class="display-5 fw-bold">{{ course.name }}</h1>
+      <p class="col-md-10 fs-5">{{ course.description }}</p>
+      <p class="text-muted mb-0">
+        Published: {{ course.pub_date|date:"F j, Y" }}
+      </p>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h3 mb-0">Lessons</h2>
+    <span class="badge bg-primary rounded-pill">
+      {{ course.lesson_set.count }} lesson{{ course.lesson_set.count|pluralize }}
+    </span>
+  </div>
+
+  <div class="list-group shadow-sm">
+    {% for lesson in course.lesson_set.all %}
+      <div class="list-group-item">
+        <div class="d-flex w-100 justify-content-between">
+          <h3 class="h5 mb-1">{{ lesson.title }}</h3>
+          <small class="text-muted">Lesson {{ forloop.counter }}</small>
+        </div>
+        <p class="mb-2">{{ lesson.content|linebreaksbr|truncatewords:45 }}</p>
+        {% if lesson.questions.exists %}
+          <span class="badge bg-secondary">
+            {{ lesson.questions.count }} exam question{{ lesson.questions.count|pluralize }}
+          </span>
+        {% endif %}
+      </div>
+    {% empty %}
+      <div class="list-group-item text-center text-muted py-4">
+        No lessons are available for this course yet.
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if user.is_authenticated %}
+    <div class="mt-4">
+      <a href="{% url 'onlinecourse:submit' course.id %}" class="btn btn-success btn-lg">
+        Start Exam
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
